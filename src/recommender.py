@@ -35,11 +35,11 @@ def _score_song(user: UserProfile, song: Song) -> Tuple[float, List[str]]:
     """
     Scores a single song against a user profile.
 
-    Scoring recipe:
-      +2.0              genre exact match
-      +1.0              mood exact match
-      +0.0 to +1.0      energy proximity: 1 - |song.energy - target_energy|
-    Max possible score: 4.0
+    EXPERIMENT — Weight Shift: energy doubled, genre halved.
+    Original:   genre +2.0, mood +1.0, energy ×1.0  (max 4.0)
+    Experiment: genre +1.0, mood +1.0, energy ×2.0  (max 4.0)
+
+    Math check: 1.0 + 1.0 + 2.0×(0.0–1.0) = 0.0 to 4.0  [valid, same ceiling]
 
     Returns:
         (score, reasons) — numeric total and a list of human-readable reason strings.
@@ -48,15 +48,15 @@ def _score_song(user: UserProfile, song: Song) -> Tuple[float, List[str]]:
     reasons = []
 
     if song.genre == user.favorite_genre:
-        score += 2.0
-        reasons.append(f"genre match (+2.0)")
+        score += 1.0                          # was 2.0 — halved
+        reasons.append(f"genre match (+1.0)")
 
     if song.mood == user.favorite_mood:
         score += 1.0
         reasons.append(f"mood match (+1.0)")
 
-    energy_points = round(1.0 - abs(song.energy - user.target_energy), 2)
-    score += energy_points
+    energy_points = round(2.0 * (1.0 - abs(song.energy - user.target_energy)), 2)
+    score += energy_points                    # was ×1.0 — doubled
     reasons.append(f"energy proximity (+{energy_points})")
 
     return score, reasons
