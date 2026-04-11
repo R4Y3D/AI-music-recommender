@@ -29,6 +29,13 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+  Basically how this system is going to work is that it reccomends songs by comparing a user's stated preferences against a catalog of songs utilizing a simple point-based scoring formula. Each song is given a score, all the songs are then ranked highest to lowest and the top results are returned with a short explanmation.
+  - +2.0 points if the song's genre matches the user's favorite genre
+  - +1.0 point if the song's mood matches the user's preferred mood
+  - +0.0 to +1.0 points based on how close the song's energy is to the user's target
+  ##### Algorithmic Recepie
+  This reccomender works and scores each song by using three rules: +2.0 points for a genre match, +1.0 point for a mood match, and up to +1.0 point based on how close the song's energy is to the user's target. The songs are each ranked then from highest to lowest and then just the top resultys are returned. One bias that might occur and be expected is that genre carries twice the weight of mood, so a great song with the right feel but the wrong genre label will often get buried.
+
 ---
 
 ## Getting Started
@@ -63,7 +70,7 @@ pytest
 ```
 
 You can add more tests in `tests/test_recommender.py`.
-
+![Terminal output](run.png)
 ---
 
 ## Experiments You Tried
