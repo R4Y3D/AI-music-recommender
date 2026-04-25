@@ -59,3 +59,42 @@ def test_explain_recommendation_returns_non_empty_string():
     explanation = rec.explain_recommendation(user, song)
     assert isinstance(explanation, str)
     assert explanation.strip() != ""
+
+
+def test_acoustic_preference_boosts_acoustic_song():
+    songs = [
+        Song(
+            id=10,
+            title="Electric Banger",
+            artist="Test Artist",
+            genre="pop",
+            mood="happy",
+            energy=0.8,
+            tempo_bpm=120,
+            valence=0.8,
+            danceability=0.8,
+            acousticness=0.1,  # low acousticness
+        ),
+        Song(
+            id=11,
+            title="Wooden Guitar Ballad",
+            artist="Test Artist",
+            genre="pop",
+            mood="happy",
+            energy=0.8,
+            tempo_bpm=120,
+            valence=0.8,
+            danceability=0.8,
+            acousticness=0.9,  # high acousticness
+        ),
+    ]
+    rec = Recommender(songs)
+    user = UserProfile(
+        favorite_genre="pop",
+        favorite_mood="happy",
+        target_energy=0.8,
+        likes_acoustic=True,
+    )
+    results = rec.recommend(user, k=2)
+    # The acoustic song should rank first when user likes acoustic
+    assert results[0].title == "Wooden Guitar Ballad"

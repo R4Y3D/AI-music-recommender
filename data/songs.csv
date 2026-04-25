@@ -1,19 +1,71 @@
 id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
-11,Golden Hour Drift,Sable Keys,r&b,romantic,0.58,96,0.78,0.71,0.42
-12,Concrete Jungle,Wavemark,hip-hop,energetic,0.80,95,0.66,0.85,0.08
-13,Rainy Cathedral,Elsine,classical,melancholic,0.22,58,0.31,0.24,0.97
-14,Drop the Signal,Flux Core,edm,energetic,0.95,140,0.72,0.92,0.03
-15,Dusty Road Home,Cal Henton,country,nostalgic,0.44,104,0.74,0.63,0.81
-16,Brass and Soul,The Copperlines,funk,happy,0.71,112,0.88,0.80,0.55
-17,Shattered Glass,Iron Veil,metal,intense,0.97,168,0.35,0.70,0.06
-18,Velvet Evening,Nora Solis,soul,romantic,0.48,88,0.82,0.66,0.73
+1,Blinding Lights,The Weeknd,Pop,Energetic,0.80,171,0.33,0.51,0.001
+2,Save Your Tears,The Weeknd,Pop,Melancholic,0.65,118,0.47,0.68,0.02
+3,Levitating,Dua Lipa,Pop,Happy,0.75,103,0.92,0.80,0.03
+4,Don't Start Now,Dua Lipa,Pop,Energetic,0.79,124,0.68,0.79,0.01
+5,Watermelon Sugar,Harry Styles,Pop,Happy,0.72,95,0.94,0.55,0.12
+6,As It Was,Harry Styles,Pop,Chill,0.70,174,0.66,0.52,0.34
+7,Stay,The Kid LAROI & Justin Bieber,Pop,Energetic,0.65,170,0.48,0.59,0.04
+8,Peaches,Justin Bieber,Pop,Chill,0.57,90,0.46,0.68,0.29
+9,Good 4 U,Olivia Rodrigo,Pop,Energetic,0.84,167,0.65,0.56,0.01
+10,Drivers License,Olivia Rodrigo,Pop,Sad,0.45,144,0.14,0.56,0.60
+11,Deja Vu,Olivia Rodrigo,Pop,Melancholic,0.62,181,0.44,0.61,0.12
+12,Anti-Hero,Taylor Swift,Pop,Reflective,0.64,97,0.51,0.63,0.12
+13,Cruel Summer,Taylor Swift,Pop,Energetic,0.74,170,0.58,0.55,0.11
+14,Cardigan,Taylor Swift,Indie,Sad,0.39,130,0.24,0.61,0.54
+15,Kill Bill,SZA,R&B,Sad,0.55,89,0.42,0.67,0.60
+16,Snooze,SZA,R&B,Chill,0.48,85,0.52,0.58,0.70
+17,Paint The Town Red,Doja Cat,Hip-Hop,Energetic,0.78,100,0.72,0.82,0.19
+18,Say So,Doja Cat,Pop,Happy,0.70,111,0.79,0.79,0.26
+19,Industry Baby,Lil Nas X & Jack Harlow,Hip-Hop,Energetic,0.83,150,0.89,0.74,0.01
+20,Montero,Lil Nas X,Hip-Hop,Energetic,0.76,178,0.61,0.63,0.04
+21,First Class,Jack Harlow,Hip-Hop,Chill,0.60,107,0.52,0.74,0.18
+22,Rockstar,DaBaby,Hip-Hop,Energetic,0.81,160,0.61,0.74,0.02
+23,The Box,Roddy Ricch,Hip-Hop,Chill,0.64,117,0.42,0.78,0.14
+24,Sunflower,Post Malone & Swae Lee,Pop,Chill,0.55,90,0.92,0.76,0.50
+25,Circles,Post Malone,Pop,Chill,0.54,120,0.50,0.69,0.16
+26,Rockstar (2020),Post Malone,Hip-Hop,Energetic,0.76,160,0.50,0.66,0.03
+27,Positions,Ariana Grande,Pop,Chill,0.57,144,0.51,0.73,0.47
+28,34+35,Ariana Grande,Pop,Playful,0.65,110,0.62,0.74,0.21
+29,We Can't Be Friends,Ariana Grande,Pop,Melancholic,0.58,120,0.40,0.65,0.25
+30,Unholy,Sam Smith & Kim Petras,Pop,Energetic,0.78,131,0.56,0.72,0.02
+31,Stay With Me,Sam Smith,Pop,Sad,0.42,84,0.25,0.51,0.70
+32,Shivers,Ed Sheeran,Pop,Energetic,0.74,141,0.89,0.82,0.28
+33,Bad Habits,Ed Sheeran,Pop,Energetic,0.80,126,0.59,0.80,0.05
+34,Shape of You,Ed Sheeran,Pop,Happy,0.82,96,0.93,0.83,0.08
+35,Cold Heart,Elton John & Dua Lipa,Pop,Chill,0.65,117,0.86,0.79,0.14
+36,About Damn Time,Lizzo,Pop,Happy,0.78,109,0.92,0.84,0.11
+37,Truth Hurts,Lizzo,Pop,Confident,0.72,158,0.75,0.71,0.11
+38,Break My Soul,Beyoncé,Pop,Energetic,0.82,115,0.78,0.79,0.02
+39,Cuff It,Beyoncé,Pop,Happy,0.77,114,0.91,0.78,0.12
+40,Easy On Me,Adele,Pop,Sad,0.35,142,0.12,0.55,0.80
+41,Hello,Adele,Pop,Sad,0.40,79,0.15,0.50,0.85
+42,Flowers,Miley Cyrus,Pop,Empowering,0.70,118,0.83,0.71,0.06
+43,Wrecking Ball,Miley Cyrus,Pop,Sad,0.50,120,0.20,0.53,0.39
+44,Heat Waves,Glass Animals,Indie,Chill,0.62,81,0.53,0.76,0.44
+45,Glimpse of Us,Joji,Indie,Sad,0.30,85,0.18,0.45,0.88
+46,Golden,Harry Styles,Pop,Happy,0.73,140,0.92,0.75,0.20
+47,Adore You,Harry Styles,Pop,Chill,0.68,100,0.56,0.67,0.32
+48,Water,Tems,R&B,Chill,0.52,97,0.70,0.75,0.45
+49,Essence,Wizkid ft. Tems,Afrobeats,Chill,0.60,102,0.88,0.79,0.52
+50,Calm Down,Rema & Selena Gomez,Afrobeats,Chill,0.65,107,0.84,0.80,0.41
+51,Last Last,Burna Boy,Afrobeats,Chill,0.70,110,0.85,0.83,0.35
+52,Super Gremlin,Kodak Black,Hip-Hop,Dark,0.68,72,0.42,0.74,0.10
+53,Rich Flex,Drake & 21 Savage,Hip-Hop,Confident,0.66,153,0.52,0.75,0.05
+54,Jimmy Cooks,Drake,Hip-Hop,Dark,0.71,165,0.50,0.70,0.02
+55,God's Plan,Drake,Hip-Hop,Reflective,0.73,77,0.50,0.75,0.10
+56,What Was I Made For,Billie Eilish,Indie,Sad,0.20,70,0.10,0.40,0.95
+57,Happier Than Ever,Billie Eilish,Indie,Dynamic,0.60,81,0.30,0.45,0.70
+58,Therefore I Am,Billie Eilish,Indie,Confident,0.55,94,0.50,0.65,0.35
+59,Greedy,Tate McRae,Pop,Energetic,0.78,111,0.80,0.82,0.10
+60,You Broke Me First,Tate McRae,Pop,Sad,0.50,124,0.30,0.60,0.45
+61,abcdefu,GAYLE,Pop,Angry,0.75,122,0.60,0.70,0.15
+62,Without Me,Halsey,Pop,Melancholic,0.65,136,0.50,0.70,0.30
+63,Closer,The Chainsmokers,EDM,Chill,0.65,95,0.60,0.75,0.20
+64,Something Just Like This,The Chainsmokers,EDM,Happy,0.78,103,0.80,0.72,0.15
+65,Turn Down For What,DJ Snake,EDM,Energetic,0.90,100,0.70,0.60,0.01
+66,Lean On,Major Lazer,EDM,Chill,0.70,98,0.85,0.78,0.10
+67,Titanium,David Guetta,EDM,Empowering,0.85,126,0.60,0.65,0.05
+68,On My Mind,Ellie Goulding,Pop,Energetic,0.75,124,0.70,0.78,0.12
+69,Love Nwantiti,CKay,Afrobeats,Chill,0.60,98,0.88,0.80,0.50
+70,Peaches & Eggplants,Young Nudy,Hip-Hop,Chill,0.65,110,0.75,0.78,0.22
