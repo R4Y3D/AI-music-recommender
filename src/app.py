@@ -8,9 +8,66 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import streamlit as st
-from src.recommender import load_songs, recommend_songs_detailed
+from src.recommender import load_songs, recommend_songs_detailed, DEFAULT_WEIGHTS
+from src.guardrails import validate_user_prefs, check_diversity
+from src.evaluator import run_evaluation, format_report
 
 MAX_SCORE = 4.5
+
+# Per-component clamp ranges for adaptive feedback weights.
+WEIGHT_CLAMPS = {
+    "genre":    (0.5, 4.0),
+    "mood":     (0.0, 2.0),
+    "energy":   (0.0, 2.0),
+    "acoustic": (0.0, 1.0),
+}
+WEIGHT_STEP = 0.1
+
+
+def _init_session_state():
+    """Initialize session-only state for the feedback loop and result memory."""
+    if "weights" not in st.session_state:
+        st.session_state.weights = DEFAULT_WEIGHTS.copy()
+    if "show_results" not in st.session_state:
+        st.session_state.show_results = False
+    if "show_diagnostics" not in st.session_state:
+        st.session_state.show_diagnostics = False
+    if "feedback_log" not in st.session_state:
+        st.session_state.feedback_log = []
+    if "current_prefs" not in st.session_state:
+        st.session_state.current_prefs = None
+
+
+def _dominant_component(breakdown: dict) -> str:
+    """Return the breakdown key with the largest non-zero contribution."""
+    non_zero = {k: v for k, v in breakdown.items() if v > 0}
+    if not non_zero:
+        return "energy"  # safe fallback
+    return max(non_zero, key=non_zero.get)
+
+
+def _bump_weight(component: str, delta: float):
+    """Adjust a weight in session state and clamp to its allowed range."""
+    weights = st.session_state.weights
+    lo, hi = WEIGHT_CLAMPS[component]
+    weights[component] = round(max(lo, min(hi, weights[component] + delta)), 2)
+
+
+def _on_like(song_title: str, breakdown: dict):
+    comp = _dominant_component(breakdown)
+    _bump_weight(comp, +WEIGHT_STEP)
+    st.session_state.feedback_log.append((song_title, "like", comp))
+
+
+def _on_dislike(song_title: str, breakdown: dict):
+    comp = _dominant_component(breakdown)
+    _bump_weight(comp, -WEIGHT_STEP)
+    st.session_state.feedback_log.append((song_title, "dislike", comp))
+
+
+def _reset_weights():
+    st.session_state.weights = DEFAULT_WEIGHTS.copy()
+    st.session_state.feedback_log = []
 
 AERO_CSS = """
 <style>
@@ -496,6 +553,7 @@ def _song_card(rank: int, result: dict, likes_acoustic: bool) -> str:
 def main():
     st.set_page_config(page_title="VibeCipher", page_icon="🎵", layout="wide")
     st.markdown(AERO_CSS, unsafe_allow_html=True)
+    _init_session_state()
 
     songs  = get_songs()
     genres = sorted({s["genre"] for s in songs})
@@ -512,17 +570,56 @@ def main():
         st.markdown("<br>", unsafe_allow_html=True)
         find_btn = st.button("► Find My Songs", use_container_width=True)
 
+        st.markdown("---")
+        st.markdown("### ⚖ Adaptive Weights")
+        st.caption("Updated by 👍 / 👎 feedback in session.")
+        w = st.session_state.weights
+        st.markdown(
+            f"<div style='font-family:monospace;font-size:0.78rem;line-height:1.7;color:#1a4466;'>"
+            f"genre&nbsp;&nbsp;&nbsp;&nbsp;<b>{w['genre']:.2f}</b><br>"
+            f"mood&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>{w['mood']:.2f}</b><br>"
+            f"energy&nbsp;&nbsp;&nbsp;<b>{w['energy']:.2f}</b><br>"
+            f"acoustic&nbsp;<b>{w['acoustic']:.2f}</b>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.button("↺ Reset Weights", use_container_width=True, on_click=_reset_weights)
+
+        st.markdown("---")
+        st.markdown("### 🔬 Reliability")
+        diag_btn = st.button("Run System Diagnostics", use_container_width=True)
+        if diag_btn:
+            st.session_state.show_diagnostics = True
+            st.session_state.show_results = False  # diagnostics view replaces results
+
+    # ── Update show_results from button click ────────────────
+    if find_btn:
+        st.session_state.show_results = True
+        st.session_state.show_diagnostics = False
+        st.session_state.current_prefs = {
+            "genre": genre,
+            "mood": mood,
+            "energy": energy,
+            "likes_acoustic": likes_acoustic,
+        }
+
     # ── Page header ───────────────────────────────────────────
     st.markdown('<div class="aero-title">♫ VibeCipher</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="aero-subtitle">'
-        'AI Music Recommender &nbsp;·&nbsp; Rule-Based Scoring Engine'
+        'AI Music Recommender &nbsp;·&nbsp; Rule-Based Scoring Engine &nbsp;·&nbsp; '
+        'with Guardrails, Diagnostics &amp; Adaptive Weights'
         '</div>',
         unsafe_allow_html=True,
     )
 
+    # ── Diagnostics view ──────────────────────────────────────
+    if st.session_state.show_diagnostics:
+        _render_diagnostics(songs)
+        return
+
     # ── Welcome state ─────────────────────────────────────────
-    if not find_btn:
+    if not st.session_state.show_results:
         st.markdown("""
         <div class="welcome-state">
           <span class="welcome-glyph">♫</span>
@@ -534,21 +631,29 @@ def main():
         """, unsafe_allow_html=True)
         return
 
+    # ── Run scoring pipeline ─────────────────────────────────
+    raw_prefs = st.session_state.current_prefs
+    sanitized, warnings = validate_user_prefs(raw_prefs, songs)
+
     # ── Active profile ────────────────────────────────────────
     st.markdown('<div class="aero-divider"></div>', unsafe_allow_html=True)
     acoustic_tag = (
         '<div class="profile-tag">Acoustic &nbsp;<b>On</b></div>'
-        if likes_acoustic else ""
+        if sanitized["likes_acoustic"] else ""
     )
     st.markdown(f"""
     <div class="section-label">Your Taste Profile</div>
     <div class="profile-row">
-      <div class="profile-tag">Genre &nbsp;<b>{genre}</b></div>
-      <div class="profile-tag">Mood &nbsp;<b>{mood}</b></div>
-      <div class="profile-tag">Energy &nbsp;<b>{energy:.2f}</b></div>
+      <div class="profile-tag">Genre &nbsp;<b>{sanitized['genre']}</b></div>
+      <div class="profile-tag">Mood &nbsp;<b>{sanitized['mood']}</b></div>
+      <div class="profile-tag">Energy &nbsp;<b>{sanitized['energy']:.2f}</b></div>
       {acoustic_tag}
     </div>
     """, unsafe_allow_html=True)
+
+    # Input guardrail warnings
+    for w_msg in warnings:
+        st.warning(f"🛡️ Input guardrail: {w_msg}")
 
     # ── Results ───────────────────────────────────────────────
     st.markdown('<div class="aero-divider"></div>', unsafe_allow_html=True)
@@ -557,16 +662,79 @@ def main():
         unsafe_allow_html=True,
     )
 
-    user_prefs = {
-        "genre": genre,
-        "mood": mood,
-        "energy": energy,
-        "likes_acoustic": likes_acoustic,
-    }
-    results = recommend_songs_detailed(user_prefs, songs, k=5)
+    results = recommend_songs_detailed(
+        sanitized, songs, k=5, weights=st.session_state.weights
+    )
 
+    # Output guardrail
+    diversity_warning = check_diversity(results)
+    if diversity_warning:
+        st.warning(f"🛡️ Output guardrail: {diversity_warning}")
+
+    # Render each card with feedback buttons beneath
     for rank, result in enumerate(results, start=1):
-        st.markdown(_song_card(rank, result, likes_acoustic), unsafe_allow_html=True)
+        st.markdown(
+            _song_card(rank, result, sanitized["likes_acoustic"]),
+            unsafe_allow_html=True,
+        )
+        like_col, dislike_col, spacer = st.columns([1, 1, 8])
+        with like_col:
+            st.button(
+                "👍 Like",
+                key=f"like_{rank}_{result['title']}",
+                on_click=_on_like,
+                args=(result["title"], result["breakdown"]),
+                use_container_width=True,
+            )
+        with dislike_col:
+            st.button(
+                "👎 Skip",
+                key=f"dislike_{rank}_{result['title']}",
+                on_click=_on_dislike,
+                args=(result["title"], result["breakdown"]),
+                use_container_width=True,
+            )
+
+    # Feedback log
+    if st.session_state.feedback_log:
+        with st.expander(f"Feedback log ({len(st.session_state.feedback_log)} entries)"):
+            for title, action, comp in st.session_state.feedback_log[-10:]:
+                st.markdown(f"- **{action}** → *{title}*  (adjusted **{comp}** weight)")
+
+
+def _render_diagnostics(songs):
+    """Run the evaluation harness and display the report inline."""
+    st.markdown('<div class="aero-divider"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-label">System Reliability Diagnostics</div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.spinner("Running evaluation harness..."):
+        results = run_evaluation(songs)
+        report = format_report(results)
+
+    # Confidence summary
+    col1, col2, col3 = st.columns([1, 1, 3])
+    col1.metric("Tests passed", f"{results['passed']} / {results['total']}")
+    col2.metric("Confidence", f"{results['confidence']:.0%}")
+    col3.caption(
+        "The evaluation harness runs 6 fixed test profiles and asserts an "
+        "expected behaviour for each — proving the recommender's reliability."
+    )
+
+    # Pass/fail bullets
+    for t in results["tests"]:
+        icon = "✅" if t["passed"] else "❌"
+        st.markdown(f"{icon} **{t['name']}** — {t['detail']}")
+        st.caption(f"_{t['rationale']}_")
+
+    st.markdown('<div class="aero-divider"></div>', unsafe_allow_html=True)
+    with st.expander("Full text report"):
+        st.code(report, language="text")
+
+    if st.button("← Back to recommender"):
+        st.session_state.show_diagnostics = False
 
 
 if __name__ == "__main__":

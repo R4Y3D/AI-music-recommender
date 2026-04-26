@@ -89,15 +89,38 @@ class Recommender:
         return ", ".join(reasons) if reasons else "Recommended based on overall similarity"
 
 
-def _score_song_detailed(user: UserProfile, song: Song) -> Dict:
+DEFAULT_WEIGHTS: Dict[str, float] = {
+    "genre": 2.0,
+    "mood": 1.0,
+    "energy": 1.0,
+    "acoustic": 0.5,
+}
+
+
+def _score_song_detailed(
+    user: UserProfile,
+    song: Song,
+    weights: Optional[Dict[str, float]] = None,
+) -> Dict:
     """
     Same scoring logic as _score_song but returns a structured breakdown dict
     instead of a (score, reasons) tuple. Used by recommend_songs_detailed.
+
+    The optional `weights` argument lets the caller (e.g. the feedback loop in
+    src/app.py) override the default weights for genre / mood / energy /
+    acoustic. When None, falls back to DEFAULT_WEIGHTS so existing tests pass
+    unchanged.
     """
-    genre_pts = 2.0 if song.genre == user.favorite_genre else 0.0
-    mood_pts = 1.0 if song.mood == user.favorite_mood else 0.0
-    energy_pts = round(1.0 - abs(song.energy - user.target_energy), 2)
-    acoustic_pts = round(0.5 * song.acousticness, 2) if user.likes_acoustic else 0.0
+    w = weights or DEFAULT_WEIGHTS
+    w_genre    = float(w.get("genre",    DEFAULT_WEIGHTS["genre"]))
+    w_mood     = float(w.get("mood",     DEFAULT_WEIGHTS["mood"]))
+    w_energy   = float(w.get("energy",   DEFAULT_WEIGHTS["energy"]))
+    w_acoustic = float(w.get("acoustic", DEFAULT_WEIGHTS["acoustic"]))
+
+    genre_pts = w_genre if song.genre == user.favorite_genre else 0.0
+    mood_pts = w_mood if song.mood == user.favorite_mood else 0.0
+    energy_pts = round(w_energy * (1.0 - abs(song.energy - user.target_energy)), 2)
+    acoustic_pts = round(w_acoustic * song.acousticness, 2) if user.likes_acoustic else 0.0
     total = round(genre_pts + mood_pts + energy_pts + acoustic_pts, 2)
 
     reasons = []
@@ -127,10 +150,18 @@ def _score_song_detailed(user: UserProfile, song: Song) -> Dict:
     }
 
 
-def recommend_songs_detailed(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Dict]:
+def recommend_songs_detailed(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5,
+    weights: Optional[Dict[str, float]] = None,
+) -> List[Dict]:
     """
     Returns the top-k songs as structured dicts with a full score breakdown.
     Used by the Streamlit UI (src/app.py).
+
+    Optional `weights` lets the caller override the default scoring weights
+    (used by the feedback loop). When None, defaults are used.
     """
     song_objects = [
         Song(
@@ -155,7 +186,7 @@ def recommend_songs_detailed(user_prefs: Dict, songs: List[Dict], k: int = 5) ->
         likes_acoustic=user_prefs.get("likes_acoustic", False),
     )
 
-    detailed = [_score_song_detailed(user, song) for song in song_objects]
+    detailed = [_score_song_detailed(user, song, weights=weights) for song in song_objects]
     return sorted(detailed, key=lambda x: x["score"], reverse=True)[:k]
 
 

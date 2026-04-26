@@ -5,6 +5,13 @@ Runs multiple user profiles - including standard and adversarial edge cases -
 to evaluate scoring behaviour across different preference combinations.
 """
 
+import sys
+
+# Ensure UTF-8 output on Windows consoles so non-ASCII artist names
+# (e.g. "Beyoncé") don't crash the runner. No-op elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 from src.recommender import load_songs, recommend_songs
 
 

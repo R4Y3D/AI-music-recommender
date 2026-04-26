@@ -1,0 +1,49 @@
+%% VibeCipher — Applied AI System Architecture
+%% Render this with the Mermaid Live Editor (https://mermaid.live)
+%% to export an SVG/PNG for the /assets/ folder. GitHub also renders
+%% this file inline when embedded in README.md as ```mermaid```.
+
+flowchart LR
+    subgraph User["👤 User"]
+        A[Sidebar Inputs<br/>genre · mood · energy · acoustic]
+        FB[Feedback 👍 / 👎]
+    end
+
+    subgraph Guardrails["🛡 Guardrails"]
+        IG[Input Validation<br/>fuzzy match · clamp]
+        OG[Output Diversity Check]
+    end
+
+    subgraph Engine["⚙ Scoring Engine"]
+        SC[_score_song_detailed<br/>genre + mood + energy + acoustic]
+        RK[Top-k Ranker]
+    end
+
+    subgraph State["💾 Session State"]
+        W[Adaptive Weights<br/>genre / mood / energy / acoustic]
+    end
+
+    subgraph Data["📁 Data"]
+        CSV[(songs.csv<br/>70 real tracks)]
+    end
+
+    subgraph Reliability["🔬 Reliability"]
+        EV[Evaluation Harness<br/>6 test profiles]
+        CR[Confidence Score<br/>+ PASS/FAIL report]
+    end
+
+    UI[🎵 Streamlit UI<br/>Cards · Breakdown Bars]
+
+    A --> IG
+    IG -->|sanitized prefs| SC
+    CSV --> SC
+    W --> SC
+    SC --> RK
+    RK --> OG
+    OG --> UI
+    UI --> FB
+    FB -->|adjust weights| W
+
+    EV -.runs scenarios against.-> SC
+    EV --> CR
+    CR -.feeds confidence to.-> UI
