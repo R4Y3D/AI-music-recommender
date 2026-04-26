@@ -2,7 +2,11 @@
 
 > A rule-based music recommender that **explains every recommendation**, **proves its own reliability**, and **adapts to user feedback** in real time.
 
+![Vibecipher](assets/Vibecipher.png)
+
 VibeCipher takes four inputs from the user: favourite genre, preferred mood, target energy level, and acoustic preference: scores all 70 songs in its catalogue against those preferences, and returns the top 5 with a transparent point-by-point breakdown of why each was chosen. The system runs an evaluation harness against itself to certify its own behaviour, validates user input through guardrails, and lets the user nudge the scoring weights with thumbs-up / thumbs-down feedback during the session.
+
+<img src="assets/Vibecipher.png" alt="VibeCipher" width="600"/>
 
 ---
 
@@ -174,7 +178,6 @@ pytest -v                          # Run the unit-test suite
 ---
 
 ## 6. Sample Interactions
-
 ### Example 1: Pop fan with high energy
 **Input:** Genre = `Pop`, Mood = `Happy`, Energy = `0.75`, Acoustic = off
 **Top-3 output:**
