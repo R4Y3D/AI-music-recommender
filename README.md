@@ -1,14 +1,14 @@
-# 🎵 VibeCipher — Applied AI Music Recommender
+# 🎵 VibeCipher: Applied AI Music Recommender
 
 > A rule-based music recommender that **explains every recommendation**, **proves its own reliability**, and **adapts to user feedback** in real time.
 
-VibeCipher takes four inputs from the user — favourite genre, preferred mood, target energy level, and acoustic preference — scores all 70 songs in its catalogue against those preferences, and returns the top 5 with a transparent point-by-point breakdown of why each was chosen. The system runs an evaluation harness against itself to certify its own behaviour, validates user input through guardrails, and lets the user nudge the scoring weights with thumbs-up / thumbs-down feedback during the session.
+VibeCipher takes four inputs from the user: favourite genre, preferred mood, target energy level, and acoustic preference: scores all 70 songs in its catalogue against those preferences, and returns the top 5 with a transparent point-by-point breakdown of why each was chosen. The system runs an evaluation harness against itself to certify its own behaviour, validates user input through guardrails, and lets the user nudge the scoring weights with thumbs-up / thumbs-down feedback during the session.
 
 ---
 
 ## 1. Base Project
 
-This project extends the **CodePath AI110 Module 3 Show project — Music Recommender Simulation**. The original starter delivered a Python class hierarchy (`Song`, `UserProfile`, `Recommender`) and a CSV-driven scoring rule (genre + mood + energy). This applied-AI extension adds:
+This project extends the **CodePath AI110 Module 3 Show project: Music Recommender Simulation**. The original starter delivered a Python class hierarchy (`Song`, `UserProfile`, `Recommender`) and a CSV-driven scoring rule (genre + mood + energy). This applied-AI extension adds:
 
 - a **70-track real-artist dataset**,
 - **acoustic preference** wired into scoring (originally collected but ignored),
@@ -23,7 +23,7 @@ This project extends the **CodePath AI110 Module 3 Show project — Music Recomm
 ## 2. System Overview
 
 The system answers a single question:
-**"Given my taste profile, which 5 songs in this catalogue best match — and why?"**
+**"Given my taste profile, which 5 songs in this catalogue best match: and why?"**
 
 It is intentionally **rule-based and explainable** rather than ML-based: every score is a sum of four named, bounded contributions. There are no embeddings, no opaque models, no cross-user training. This trade-off favours transparency and demo-readiness over recommendation power, which is appropriate for a classroom applied-AI artefact.
 
@@ -85,7 +85,7 @@ flowchart LR
 ```
 
 **Data flow in plain English:**
-The user's sidebar inputs pass through the **Input Guardrail**, which fuzzy-matches misspelled genres/moods and clamps energy to `[0.0, 1.0]`. The sanitised preferences and the **session weights** (live-updated by feedback) are handed to the **Scoring Engine**, which scores every track in `songs.csv` and returns the top 5. The **Output Guardrail** flags low-diversity result sets. The UI renders each result as a card with a colour-coded breakdown bar per scoring component. The user's 👍 / 👎 clicks feed back into the session weights so subsequent scans reflect what they liked. The **Evaluation Harness** sits alongside the engine and can be triggered from the sidebar — it runs six fixed test profiles and reports an overall confidence percentage.
+The user's sidebar inputs pass through the **Input Guardrail**, which fuzzy-matches misspelled genres/moods and clamps energy to `[0.0, 1.0]`. The sanitised preferences and the **session weights** (live-updated by feedback) are handed to the **Scoring Engine**, which scores every track in `songs.csv` and returns the top 5. The **Output Guardrail** flags low-diversity result sets. The UI renders each result as a card with a colour-coded breakdown bar per scoring component. The user's 👍 / 👎 clicks feed back into the session weights so subsequent scans reflect what they liked. The **Evaluation Harness** sits alongside the engine and can be triggered from the sidebar: it runs six fixed test profiles and reports an overall confidence percentage.
 
 The Mermaid source is also stored at [`assets/system_diagram.mmd`](assets/system_diagram.mmd).
 
@@ -93,7 +93,7 @@ The Mermaid source is also stored at [`assets/system_diagram.mmd`](assets/system
 
 ## 4. AI Features
 
-### 4.1 — Scoring engine (the core decision logic)
+### 4.1: Scoring engine (the core decision logic)
 
 For every `(user, song)` pair, [`_score_song_detailed`](src/recommender.py) computes:
 
@@ -106,7 +106,7 @@ For every `(user, song)` pair, [`_score_song_detailed`](src/recommender.py) comp
 
 **Default max score: 4.5.** With adaptive weights pushed to their ceilings, the practical max rises to 9.0, but the relative ordering stays meaningful.
 
-### 4.2 — Evaluation Harness *(reliability AI feature)*
+### 4.2: Evaluation Harness *(reliability AI feature)*
 
 [`src/evaluator.py`](src/evaluator.py) defines six fixed test profiles, runs each through the recommender, and asserts an expected behaviour:
 
@@ -123,9 +123,9 @@ Run from the CLI:
 ```bash
 python -m src.evaluator
 ```
-Or click **🔬 Run System Diagnostics** in the Streamlit sidebar — the report renders inline with a confidence metric.
+Or click **🔬 Run System Diagnostics** in the Streamlit sidebar: the report renders inline with a confidence metric.
 
-### 4.3 — Guardrails *(input + output validation)*
+### 4.3: Guardrails *(input + output validation)*
 
 **Input guardrail** (`validate_user_prefs` in [`src/guardrails.py`](src/guardrails.py)):
 - Genre / mood: exact match → case-insensitive match → fuzzy match (`difflib.get_close_matches`, cutoff 0.6) → fall back to the catalogue's most common value
@@ -134,9 +134,9 @@ Or click **🔬 Run System Diagnostics** in the Streamlit sidebar — the report
 
 Each correction surfaces as a `st.warning(...)` banner so the user can see what the system did with their input.
 
-**Output guardrail** (`check_diversity`): if all 5 results share a single genre or single mood, the UI shows a yellow warning suggesting how to broaden the result mix. Behaviour is non-destructive — the recommendations are still shown.
+**Output guardrail** (`check_diversity`): if all 5 results share a single genre or single mood, the UI shows a yellow warning suggesting how to broaden the result mix. Behaviour is non-destructive: the recommendations are still shown.
 
-### 4.4 — Adaptive Feedback Loop
+### 4.4: Adaptive Feedback Loop
 
 Each result card has a 👍 / 👎 row. On click:
 
@@ -175,7 +175,7 @@ pytest -v                          # Run the unit-test suite
 
 ## 6. Sample Interactions
 
-### Example 1 — Pop fan with high energy
+### Example 1: Pop fan with high energy
 **Input:** Genre = `Pop`, Mood = `Happy`, Energy = `0.75`, Acoustic = off
 **Top-3 output:**
 1. *Levitating* — Dua Lipa  (score 3.97 / 4.5)
@@ -183,7 +183,7 @@ pytest -v                          # Run the unit-test suite
 3. *Cuff It* — Beyoncé  (score 3.93)
 *Why:* All three match genre (+2.0) and mood (+1.0); energy proximity does the tie-breaking.
 
-### Example 2 — Acoustic late-night listener
+### Example 2: Acoustic late-night listener
 **Input:** Genre = `Pop`, Mood = `Sad`, Energy = `0.4`, Acoustic = **on**
 **Top-3 output:**
 1. *Hello* — Adele  (score 4.43, acoustic bonus +0.42)
@@ -191,11 +191,11 @@ pytest -v                          # Run the unit-test suite
 3. *Drivers License* — Olivia Rodrigo  (score 3.85)
 *Why:* The acoustic bonus only activates when the checkbox is on, which is what pushes Adele to the very top despite having a small energy gap.
 
-### Example 3 — Misspelled genre triggers the input guardrail
+### Example 3: Misspelled genre triggers the input guardrail
 **Input:** Genre = `pop` *(lowercase, doesn't match the catalogue's `Pop`)*
 **System behaviour:**
 - 🛡️ Input guardrail banner appears: *"Genre 'pop' matched to 'Pop' (case-insensitive)."*
-- Recommendations are returned normally — the system did not crash and did not silently fall back to a wrong genre.
+- Recommendations are returned normally: the system did not crash and did not silently fall back to a wrong genre.
 
 ---
 
@@ -203,8 +203,8 @@ pytest -v                          # Run the unit-test suite
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit tests (pytest) | `pytest -v` | **7 / 7 passed** — covers core scoring, acoustic bonus, fuzzy genre match, energy clamp, diversity warning |
-| Reliability evaluator | `python -m src.evaluator` | **6 / 6 passed** — confidence **100%** on the current catalogue |
+| Unit tests (pytest) | `pytest -v` | **7 / 7 passed**: covers core scoring, acoustic bonus, fuzzy genre match, energy clamp, diversity warning |
+| Reliability evaluator | `python -m src.evaluator` | **6 / 6 passed**: confidence **100%** on the current catalogue |
 | Manual UI flows | three demo flows in §6 | All pass; guardrail warnings render; feedback loop visibly shifts weights |
 
 ---
@@ -214,7 +214,7 @@ pytest -v                          # Run the unit-test suite
 **Limitations**
 - Genre and mood matching is exact-string. `Indie` and `Indie Pop` are treated as unrelated; a real product would need a taxonomy.
 - The catalogue has 70 real songs but is heavily Pop-weighted. Niche taste profiles (Afrobeats, Indie, Country) get fewer high-quality matches.
-- The feedback loop affects only the current session — it does not persist across page refresh. This is intentional for a demo (reproducible state) but a real product would persist per user.
+- The feedback loop affects only the current session: it does not persist across page refresh. This is intentional for a demo (reproducible state) but a real product would persist per user.
 - Scoring weights are hand-set, not learned. The system cannot discover that, say, energy matters more than mood for a particular user without explicit 👍 / 👎 input.
 
 **Where bias can creep in**
@@ -223,7 +223,7 @@ pytest -v                          # Run the unit-test suite
 - Mood labels are subjective. Whether *Anti-Hero* is `Reflective` or `Sad` is a single human's call, and that label propagates through every recommendation.
 
 **What I learned**
-Recommenders aren't magic — they're a scoring rule applied at scale. The hard part isn't the math, it's deciding *which signals to weight* and being honest about what you're ignoring (in this system: lyrics, popularity, time-of-day, social signals, listening history). The evaluation harness was the most surprising thing to build: writing tests that *describe* what good behaviour looks like forced me to articulate things I'd only assumed before — like "a Pop user should always get Pop at #1" or "the same input must produce the same output." Those assertions caught one real bug during development (a stale weight experiment was inverting genre and energy weights).
+Recommenders aren't magic: they're a scoring rule applied at scale. The hard part isn't the math, it's deciding *which signals to weight* and being honest about what you're ignoring (in this system: lyrics, popularity, time-of-day, social signals, listening history). The evaluation harness was the most surprising thing to build: writing tests that *describe* what good behaviour looks like forced me to articulate things I'd only assumed before: like "a Pop user should always get Pop at #1" or "the same input must produce the same output." Those assertions caught one real bug during development (a stale weight experiment was inverting genre and energy weights).
 
 ---
 
@@ -235,9 +235,9 @@ A 5-minute demo of this project is recorded here:
 The walkthrough script:
 
 1. **Open the UI.** Choose `Pop` / `Happy` / `0.75` / acoustic off → click **Find My Songs**. Show the top 5 cards and explain the four breakdown bars.
-2. **Adaptive feedback.** Click 👍 on the #1 result. Show how the **genre** weight jumps from 2.0 → 2.1 in the sidebar. Run again — the genre dominance is even sharper.
+2. **Adaptive feedback.** Click 👍 on the #1 result. Show how the **genre** weight jumps from 2.0 → 2.1 in the sidebar. Run again: the genre dominance is even sharper.
 3. **Guardrails.** Reset weights, switch genre to `pop` (lowercase) by typing it in. Show the 🛡️ banner and explain that the system fuzzy-matched it to `Pop` instead of crashing.
-4. **Diagnostics.** Click **🔬 Run System Diagnostics** in the sidebar. Show the 6 / 6 PASS report and the 100% confidence metric — this is the "AI feature" that proves the system actually does what it says.
+4. **Diagnostics.** Click **🔬 Run System Diagnostics** in the sidebar. Show the 6 / 6 PASS report and the 100% confidence metric: this is the "AI feature" that proves the system actually does what it says.
 
 ---
 
